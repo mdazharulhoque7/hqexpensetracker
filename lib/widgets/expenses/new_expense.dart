@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hqexpensetracker/models/expense.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key});
+  const NewExpense({super.key, required this.onAddExpense});
+  final void Function(Expense expense) onAddExpense;
 
   @override
   State<NewExpense> createState() {
@@ -42,29 +43,69 @@ class _NewExpenseState extends State<NewExpense> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Invalid Input!'),
-          content: Column(
+          title: Row(
+            spacing: 12,
             children: [
-              Text(
-                'Please make sure you entered all the required data',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize:16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              const Icon(Icons.error, color: Colors.red),
+              const Text('Invalid Input!', style: TextStyle(
+                color: Colors.red,
+              ),),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [Text(
+                  'Please make sure you entered all the required data',
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 189, 38, 31),
+                    fontWeight: FontWeight.bold,
+
+                  ),
+                  
+                ),    
               SizedBox(height: 16),
               if (_titleController.text.trim().isEmpty)
-                Text(
-                  'Title can\'t be empty',
+                RichText(
+                  text: TextSpan(
                   style: TextStyle(color: Colors.red),
+                  children: <TextSpan>[
+                    TextSpan(text:'Title', style: TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+                    TextSpan(text:' can\'t be empty')
+                  ]
+
+                  ),
                 ),
               if (isAmountInvalid)
-                Text('Invalid amount', style: TextStyle(color: Colors.red)),
+                RichText(
+                  text: TextSpan(
+                  style: TextStyle(color: Colors.red),
+                  children: <TextSpan>[
+                    TextSpan(text:'Invalid '),
+                    TextSpan(text:'amount', style: TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+                  ]
+                  ),  
+                ),            
               if (_selectedDate == null)
-                Text('Please pick date', style: TextStyle(color: Colors.red)),
+                RichText(
+                  text: TextSpan(
+                  style: TextStyle(color: Colors.red),
+                  children: <TextSpan>[
+                    TextSpan(text:'Please pick '),
+                    TextSpan(text:'date', style: TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+                  ]
+                  ),  
+                ),                          
               if (_seletedCategory == null)
-                Text('Select category', style: TextStyle(color: Colors.red)),
+                RichText(
+                  text: TextSpan(
+                  style: TextStyle(color: Colors.red),
+                  children: <TextSpan>[
+                    TextSpan(text:'Select '),
+                    TextSpan(text:'category', style: TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+                  ]
+                  ),  
+                ),                                        
             ],
           ),
           actions: [
@@ -77,6 +118,8 @@ class _NewExpenseState extends State<NewExpense> {
       );
       return;
     }
+    widget.onAddExpense(Expense(title: _titleController.text.trim(), amount: enteredAmount, date: _selectedDate!, category: _seletedCategory!));
+    Navigator.pop(context);
   }
 
   @override
@@ -89,7 +132,7 @@ class _NewExpenseState extends State<NewExpense> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16,50,16,16),
       child: Column(
         children: [
           TextField(
